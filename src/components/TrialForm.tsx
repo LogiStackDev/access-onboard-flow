@@ -1,5 +1,6 @@
 
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +15,7 @@ import {
 } from "@/components/ui/card";
 
 const TrialForm = () => {
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -30,19 +32,12 @@ const TrialForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-
-    // This is just a placeholder. In a real implementation with Supabase,
-    // you would handle the registration here
     
-    // Simulate API call
-    setTimeout(() => {
-      toast({
-        title: "Registration submitted!",
-        description: "We'll be in touch soon to activate your trial.",
-      });
-      setIsSubmitting(false);
-      setFormData({ fullName: "", email: "", company: "" });
-    }, 1500);
+    // Store form data in session storage so it can be pre-filled in the registration form
+    sessionStorage.setItem('trialFormData', JSON.stringify(formData));
+    
+    // Redirect to registration page
+    navigate('/register');
   };
 
   return (

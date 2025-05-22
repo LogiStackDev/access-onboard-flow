@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,8 +13,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const Register = () => {
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -23,30 +25,78 @@ const Register = () => {
     password: "",
     company: "",
   });
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setError(null); // Clear error when user types
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError(null);
 
-    // This is just a placeholder. In a real implementation with Supabase,
-    // you would handle the registration here:
-    // 1. Register the user with Supabase Auth
-    // 2. Create a record in the trials table with an expiration date of 2 weeks from now
-    // 3. Send a welcome email
-
-    // Simulate API call
-    setTimeout(() => {
-      toast({
-        title: "Registration successful!",
-        description: "Your 2-week trial has been activated.",
+    try {
+      // 1. Register the user with Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            full_name: formData.fullName,
+            company: formData.company,
+          },
+        },
       });
+
+      if (authError) throw authError;
+      
+      if (authData.user) {
+        // 2. Get trial length setting
+        const { data: settingsData, error: settingsError } = await supabase
+          .from('settings')
+          .select('value')
+          .eq('name', 'trial_length_days')
+          .single();
+          
+        if (settingsError) throw settingsError;
+        
+        // 3. Calculate trial end date
+        const trialLengthDays = parseInt(settingsData.value, 10) || 14;
+        const endDate = new Date();
+        endDate.setDate(endDate.getDate() + trialLengthDays);
+        
+        // 4. Create a trial record
+        const { error: trialError } = await supabase
+          .from('trials')
+          .insert({
+            user_id: authData.user.id,
+            end_date: endDate.toISOString(),
+          });
+          
+        if (trialError) throw trialError;
+        
+        toast({
+          title: "Registration successful!",
+          description: `Your ${trialLengthDays}-day trial has been activated.`,
+        });
+        
+        // 5. Redirect to main page
+        navigate('/');
+      }
+    } catch (error: any) {
+      console.error('Registration error:', error);
+      setError(error.message || 'An error occurred during registration');
+      toast({
+        title: "Registration failed",
+        description: error.message || "An error occurred during registration",
+        variant: "destructive",
+      });
+    } finally {
       setIsSubmitting(false);
-    }, 1500);
+    }
   };
 
   return (
@@ -103,6 +153,9 @@ const Register = () => {
                 required
               />
             </div>
+            {error && (
+              <div className="text-red-500 text-sm">{error}</div>
+            )}
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button
