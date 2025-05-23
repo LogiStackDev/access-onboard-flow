@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { Textarea } from "@/components/ui/textarea";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 
 type ProfileData = {
   email: string;
@@ -47,7 +46,7 @@ const ProfileForm = () => {
       
       const user = sessionData.session.user;
       
-      // Get user's profile data
+      // Get user's profile data from the profiles table
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
@@ -98,7 +97,7 @@ const ProfileForm = () => {
       
       const userId = sessionData.session.user.id;
       
-      // Upsert profile data
+      // Upsert profile data to the profiles table
       const { error } = await supabase
         .from("profiles")
         .upsert({
