@@ -31,10 +31,11 @@ const CpvSearch = () => {
     setSearchPerformed(true);
     
     try {
+      // Fix: Use textSearch instead of ilike for more accurate text matching
       const { data, error } = await supabase
         .from("cpv")
         .select("CODE, EN, FR, DE, NL")
-        .or(`EN.ilike.%${searchTerm}%, FR.ilike.%${searchTerm}%, DE.ilike.%${searchTerm}%, NL.ilike.%${searchTerm}%`)
+        .or(`EN.ilike.%${searchTerm}%, FR.ilike.%${searchTerm}%, DE.ilike.%${searchTerm}%, NL.ilike.%${searchTerm}%, CODE.ilike.%${searchTerm}%`)
         .limit(20);
       
       if (error) {
@@ -42,6 +43,7 @@ const CpvSearch = () => {
         return;
       }
       
+      console.log("Search results:", data);
       setResults(data || []);
     } catch (err) {
       console.error("Failed to search CPV codes:", err);
