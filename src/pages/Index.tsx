@@ -5,6 +5,7 @@ import Features from "@/components/Features";
 import FAQ from "@/components/FAQ";
 import CallToAction from "@/components/CallToAction";
 import TrialForm from "@/components/TrialForm";
+import CpvSearch from "@/components/CpvSearch";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -47,6 +48,13 @@ const Index = () => {
         </div>
       </section>
 
+      {/* CPV Search Component */}
+      <section className="py-12 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <CpvSearch />
+        </div>
+      </section>
+      
       <Features />
 
       {/* Testimonial Section */}

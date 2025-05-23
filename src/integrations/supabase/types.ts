@@ -9,6 +9,30 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      cpv: {
+        Row: {
+          CODE: string | null
+          DE: string | null
+          EN: string | null
+          FR: string | null
+          NL: string | null
+        }
+        Insert: {
+          CODE?: string | null
+          DE?: string | null
+          EN?: string | null
+          FR?: string | null
+          NL?: string | null
+        }
+        Update: {
+          CODE?: string | null
+          DE?: string | null
+          EN?: string | null
+          FR?: string | null
+          NL?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           company_description: string | null
