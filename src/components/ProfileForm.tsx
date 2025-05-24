@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { Textarea } from "@/components/ui/textarea";
+import CpvSelector from "./CpvSelector";
 
 type ProfileData = {
   email: string;
@@ -82,6 +83,10 @@ const ProfileForm = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setProfile(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleCpvCodesChange = (codes: string[]) => {
+    setProfile(prev => ({ ...prev, cpv_codes: codes }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -211,23 +216,11 @@ const ProfileForm = () => {
           />
         </div>
         
-        <div>
-          <Label htmlFor="cpv_codes">CPV Codes</Label>
-          <Input
-            id="cpv_codes"
-            name="cpv_codes"
-            value={profile.cpv_codes.join(", ")}
-            onChange={(e) => {
-              const codes = e.target.value
-                .split(",")
-                .map((code) => code.trim())
-                .filter((code) => code.length > 0);
-              setProfile((prev) => ({ ...prev, cpv_codes: codes }));
-            }}
-            placeholder="Enter CPV codes separated by commas"
-          />
-          <p className="text-sm text-gray-500 mt-1">Separate codes with commas</p>
-        </div>
+        <CpvSelector
+          selectedCodes={profile.cpv_codes}
+          onCodesChange={handleCpvCodesChange}
+          maxCodes={5}
+        />
       </div>
 
       <Button 

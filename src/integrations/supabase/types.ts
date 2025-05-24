@@ -11,21 +11,21 @@ export type Database = {
     Tables: {
       cpv: {
         Row: {
-          CODE: string | null
+          CODE: string
           DE: string | null
           EN: string | null
           FR: string | null
           NL: string | null
         }
         Insert: {
-          CODE?: string | null
+          CODE: string
           DE?: string | null
           EN?: string | null
           FR?: string | null
           NL?: string | null
         }
         Update: {
-          CODE?: string | null
+          CODE?: string
           DE?: string | null
           EN?: string | null
           FR?: string | null
